@@ -1,25 +1,16 @@
-import { Component } from "react";
+import { useState } from "react";
 import FeedbackOptions from "./components/FeedbackOptions/FeedbackOptions.jsx";
 import Statictics from "./components/Statistics/Statistics.jsx";
 
-class App extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  };
+export default function App() {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
 
-  countTotalFeedback = () => {
-    const { good, neutral, bad } = this.state;
-    let total = good + neutral + bad;
-    return total;
-  };
+  const countTotalFeedback = () => good + neutral + bad;
 
-  countPositiveFeedbackPercentage = () => {
-    const { good } = this.state;
-
-    let percents = 0;
-    percents = (100 * good) / this.countTotalFeedback();
+  const countPositiveFeedbackPercentage = () => {
+    let percents = (100 * good) / countTotalFeedback();
 
     if (isNaN(percents)) {
       return (percents = 0);
@@ -32,28 +23,36 @@ class App extends Component {
     return percents;
   };
 
-  onLeaveFeedback = option => {
-    this.setState(prevState => ({ [option]: prevState[option] + 1 }));
+  const onLeaveFeedback = e => {
+    const value = e.target.textContent.toLowerCase();
+
+    switch (value) {
+      case "good":
+        setGood(good + 1);
+        break;
+      case "neutral":
+        setNeutral(neutral + 1);
+        break;
+      case "bad":
+        setBad(bad + 1);
+        break;
+
+      default:
+        break;
+    }
   };
 
-  render() {
-    return (
-      <section>
-        <FeedbackOptions
-          options={this.state}
-          onLeaveFeedback={this.onLeaveFeedback}
-        />
+  return (
+    <section>
+      <FeedbackOptions onLeaveFeedback={onLeaveFeedback} />
 
-        <Statictics
-          good={this.state.good}
-          neutral={this.state.neutral}
-          bad={this.state.bad}
-          total={this.countTotalFeedback()}
-          positivePercentage={this.countPositiveFeedbackPercentage()}
-        />
-      </section>
-    );
-  }
+      <Statictics
+        good={good}
+        neutral={neutral}
+        bad={bad}
+        total={countTotalFeedback()}
+        positivePercentage={countPositiveFeedbackPercentage()}
+      />
+    </section>
+  );
 }
-
-export default App;
